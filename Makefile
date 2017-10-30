@@ -85,7 +85,7 @@ $(TMP)/$(FEMM)/README.txt:
 
 KICAD_CFG = -DCMAKE_INSTALL_PREFIX=$(CWD)/kicad -DKICAD_GOST=ON
 .PHONY: kicad
-kicad: kicad/bin/kicad kicad/i18n
+kicad: kicad/bin/kicad kicad/i18n kicad/lib
 kicad/bin/kicad: $(SRC)/$(KICAD)/README.txt
 	rm -rf $(TMP)/$(KICAD) ; mkdir $(TMP)/$(KICAD) ; cd $(TMP)/$(KICAD) ;\
 	cmake $(KICAD_CFG) $(SRC)/$(KICAD) &&\
@@ -95,10 +95,13 @@ kicad/share/kicad/internat/ru/kicad.mo: $(SRC)/$(KICAD)-i18n/README.adoc
 	rm -rf $(TMP)/$(KICAD)-i18n ; mkdir $(TMP)/$(KICAD)-i18n ; cd $(TMP)/$(KICAD)-i18n ;\
 	cmake $(KICAD_CFG) $(SRC)/$(KICAD)-i18n &&\
 	$(MAKE) -j$(PROC_NUM) && $(MAKE) install
+kicad/lib: $(SRC)/$(KICAD)-library/README.md 	
 $(SRC)/$(KICAD)/README.txt:
 	git clone --depth=1 https://git.launchpad.net/kicad $(SRC)/$(KICAD)
 $(SRC)/$(KICAD)-i18n/README.adoc:
 	git clone --depth=1 https://git.launchpad.net/kicad-i18n $(SRC)/$(KICAD)-i18n
+$(SRC)/$(KICAD)-library/README.md:
+	git clone --depth=1 https://github.com/KiCad/kicad-library $(SRC)/$(KICAD)-library
 
 # manuals
 
