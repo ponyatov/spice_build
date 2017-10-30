@@ -86,7 +86,8 @@ $(TMP)/$(FEMM)/README.txt:
 .PHONY: kicad
 kicad: $(SRC)/$(KICAD)/README.txt
 	rm -rf $(TMP)/$(KICAD) ; mkdir $(TMP)/$(KICAD) ; cd $(TMP)/$(KICAD) ;\
-	cmake $(SRC)/$(KICAD) && $(MAKE) -j$(PROC_NUM)
+	cmake -DCMAKE_INSTALL_PREFIX=$(CWD)/kicad $(SRC)/$(KICAD) &&\
+	$(MAKE) -j$(PROC_NUM) && $(MAKE) install
 $(SRC)/$(KICAD)/README.txt:
 	git clone --depth=1 https://git.launchpad.net/kicad $(SRC)/$(KICAD) 
 
