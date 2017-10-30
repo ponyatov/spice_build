@@ -6,6 +6,7 @@ SPICE_VER = 27
 
 SPICE = ngspice-$(SPICE_VER)
 FEMM = xfemm
+KICAD = kicad
 
 # component source code arhives (excluding git-cloned)
 
@@ -36,7 +37,7 @@ WGET = wget -c
 # default
 
 .PHONY: all
-all: dirs doc src
+all: dirs doc src spice femm kicad
 
 # directory structure
 
@@ -51,7 +52,9 @@ dirs:
 gz: $(GZ)/$(SPICE_GZ)
 
 .PHONY: src
-src:
+src: \
+	$(SRC)/$(SPICE)/configure $(TMP)/$(FEMM)/README.txt \
+	$(SRC)/$(KICAD)/README.txt
 
 $(SRC)/%/configure: $(GZ)/%.tar.gz
 	cd $(SRC) ; tar zx < $< && touch $@
@@ -77,6 +80,15 @@ $(TMP)/$(FEMM)/cfemm/bin/fsolver: $(TMP)/$(FEMM)/README.txt
 	cmake . && $(MAKE) -j$(PROC_NUM)
 $(TMP)/$(FEMM)/README.txt:
 	hg clone http://hg.code.sf.net/p/xfemm/hgrepo $(TMP)/$(FEMM)
+	
+# KiCAD
+
+.PHONY: kicad
+kicad: $(SRC)/$(KICAD)/README.txt
+	rm -rf $(TMP)/$(KICAD) ; mkdir $(TMP)/$(KICAD) ; cd $(TMP)/$(KICAD) ;\
+	cmake $(SRC)/$(KICAD) && $(MAKE) -j$(PROC_NUM)
+$(SRC)/$(KICAD)/README.txt:
+	git clone --depth=1 https://git.launchpad.net/kicad $(SRC)/$(KICAD) 
 
 # manuals
 
@@ -91,4 +103,7 @@ $(DOC)/$(FEMM_PDF):
 
 .PHONY: packages
 packages:
-	sudo apt install git make wget gcc g++ mercurial
+	sudo apt install git make wget gcc g++ mercurial\
+		libwxgtk3.0-dev libglew-dev libglm-dev \
+		libcurl4-openssl-dev libssl-dev libcairo2-dev \
+		libboost-dev libboost-test-dev
