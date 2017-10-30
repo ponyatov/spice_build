@@ -5,3 +5,5 @@
 * xfemm		electro/magnetic modeling solver
 * KiCAD		pcb/schematics EDA
 * FreeCAD	generic mechanical CAD
+
+wiki manual (ru): https://github.com/ponyatov/spice/wiki
