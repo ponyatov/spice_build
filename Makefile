@@ -1,5 +1,9 @@
 .PHONY: all
-all:
+all: dirs
+
+.PHONY: dirs
+dirs:
+	ln -fs ~/src src ; ln -fs ~/tmp tmp
 
 .PHONY: packages
 packages:
