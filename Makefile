@@ -26,7 +26,8 @@ CWD = $(CURDIR)
 SRC = $(CWD)/src
 TMP = $(CWD)/tmp
 GZ = $(CWD)/gz
-DOC = $(CWD)/doc
+PFX = $(CWD)/target
+DOC = $(PFX)/doc
 
 # tools
 
@@ -43,7 +44,7 @@ all: dirs doc src spice femm kicad
 
 .PHONY: dirs
 dirs:
-	mkdir -p $(GZ) $(DOC)
+	mkdir -p $(GZ) $(PFX) $(DOC) 
 	ln -fs ~/src $(SRC) ; ln -fs ~/tmp $(TMP)
 	
 # make source code
@@ -65,16 +66,16 @@ $(SRC)/%/configure: $(GZ)/%.tar.gz
 spice: spice/bin/ngspice $(DOC)/$(SPICE_PDF)
 spice/bin/ngspice: $(SRC)/$(SPICE)/configure
 	rm -rf $(TMP)/$(SPICE) ; mkdir $(TMP)/$(SPICE) ; cd $(TMP)/$(SPICE) ;\
-	$< --prefix=$(CWD)/$@ && $(MAKE) -j$(PROC_NUM) && $(MAKE) install
+	$< --prefix=$(PFX) && $(MAKE) -j$(PROC_NUM) && $(MAKE) install
 $(GZ)/$(SPICE_GZ):
 	$(WGET) -O $@ $(SPICE_URL)/$(SPICE_GZ)
 	
 # FEMM
 
 .PHONY: femm
-femm: femm/fsolver $(DOC)/$(FEMM_PDF)
-femm/fsolver: $(TMP)/$(FEMM)/cfemm/bin/fsolver
-	cp -r $(TMP)/$(FEMM)/cfemm/bin femm
+femm: $(PFX)/bin/fsolver $(DOC)/$(FEMM_PDF)
+$(PFX)/bin/fsolver: $(TMP)/$(FEMM)/cfemm/bin/fsolver
+	cp -r $(TMP)/$(FEMM)/cfemm/bin $(PFX)/
 $(TMP)/$(FEMM)/cfemm/bin/fsolver: $(TMP)/$(FEMM)/README.txt
 	cd $(TMP)/$(FEMM)/cfemm ; $(MAKE) clean ;\
 	cmake . && $(MAKE) -j$(PROC_NUM)
@@ -83,7 +84,7 @@ $(TMP)/$(FEMM)/README.txt:
 	
 # KiCAD
 
-KICAD_CFG = -DCMAKE_INSTALL_PREFIX=$(CWD)/kicad -DKICAD_GOST=ON
+KICAD_CFG = -DCMAKE_INSTALL_PREFIX=$(PFX) -DKICAD_GOST=ON
 .PHONY: kicad
 kicad: kicad/bin/kicad kicad/i18n kicad/lib
 kicad/bin/kicad: $(SRC)/$(KICAD)/README.txt
