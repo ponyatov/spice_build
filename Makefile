@@ -43,8 +43,11 @@ dirs:
 	
 # make source code
 
+.PHONY: gz
+gz: $(GZ)/$(SPICE_GZ)
+
 .PHONY: src
-src: spice
+src:
 
 $(SRC)/%/configure: $(GZ)/%.tar.gz
 	cd $(SRC) ; tar zx < $< && touch $@
@@ -52,9 +55,10 @@ $(SRC)/%/configure: $(GZ)/%.tar.gz
 # SPICE
 
 .PHONY: spice
-spice: $(SRC)/$(SPICE)/configure
+spice: spice/bin/ngspice
+spice/bin/ngspice: $(SRC)/$(SPICE)/configure
 	rm -rf $(TMP)/$(SPICE) ; mkdir $(TMP)/$(SPICE) ; cd $(TMP)/$(SPICE) ;\
-	$< --prefix=$(CWD)/$@ && $(MAKE) -j$(PROC_NUM) 
+	$< --prefix=$(CWD)/$@ && $(MAKE) -j$(PROC_NUM) && $(MAKE) install
 $(GZ)/$(SPICE_GZ):
 	$(WGET) -O $@ $(SPICE_URL)/$(SPICE_GZ)
 
