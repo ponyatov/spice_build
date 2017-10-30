@@ -83,13 +83,22 @@ $(TMP)/$(FEMM)/README.txt:
 	
 # KiCAD
 
+KICAD_CFG = -DCMAKE_INSTALL_PREFIX=$(CWD)/kicad -DKICAD_GOST=ON
 .PHONY: kicad
-kicad: $(SRC)/$(KICAD)/README.txt
+kicad: kicad/bin/kicad kicad/i18n
+kicad/bin/kicad: $(SRC)/$(KICAD)/README.txt
 	rm -rf $(TMP)/$(KICAD) ; mkdir $(TMP)/$(KICAD) ; cd $(TMP)/$(KICAD) ;\
-	cmake -DCMAKE_INSTALL_PREFIX=$(CWD)/kicad $(SRC)/$(KICAD) &&\
+	cmake $(KICAD_CFG) $(SRC)/$(KICAD) &&\
+	$(MAKE) -j$(PROC_NUM) && $(MAKE) install
+kicad/i18n: kicad/share/kicad/internat/ru/kicad.mo
+kicad/share/kicad/internat/ru/kicad.mo: $(SRC)/$(KICAD)-i18n/README.adoc
+	rm -rf $(TMP)/$(KICAD)-i18n ; mkdir $(TMP)/$(KICAD)-i18n ; cd $(TMP)/$(KICAD)-i18n ;\
+	cmake $(KICAD_CFG) $(SRC)/$(KICAD)-i18n &&\
 	$(MAKE) -j$(PROC_NUM) && $(MAKE) install
 $(SRC)/$(KICAD)/README.txt:
-	git clone --depth=1 https://git.launchpad.net/kicad $(SRC)/$(KICAD) 
+	git clone --depth=1 https://git.launchpad.net/kicad $(SRC)/$(KICAD)
+$(SRC)/$(KICAD)-i18n/README.adoc:
+	git clone --depth=1 https://git.launchpad.net/kicad-i18n $(SRC)/$(KICAD)-i18n
 
 # manuals
 
@@ -107,4 +116,6 @@ packages:
 	sudo apt install git make wget gcc g++ mercurial\
 		libwxgtk3.0-dev libglew-dev libglm-dev \
 		libcurl4-openssl-dev libssl-dev libcairo2-dev \
-		libboost-dev libboost-test-dev
+		libboost-dev libboost-test-dev \
+		gettext
+#		textpo-dev
