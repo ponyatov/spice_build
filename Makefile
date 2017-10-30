@@ -9,11 +9,14 @@ SPICE = ngspice-$(SPICE_VER)
 # component source code arhives (excluding git-cloned)
 
 SPICE_GZ  = $(SPICE).tar.gz
-SPICE_PDF = $(SPICE)-manual.pdf 
+SPICE_PDF = $(SPICE)-manual.pdf
+
+FEMM_PDF  = femm-42-manual.pdf 
 
 # component download URLs
 
 SPICE_URL = https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/$(SPICE_VER)
+FEMM_PDF_URL = http://www.femm.info/Archives/doc/manual42.pdf
 
 # directories
 
@@ -65,9 +68,11 @@ $(GZ)/$(SPICE_GZ):
 # manuals
 
 .PHONY: doc
-doc: $(DOC)/$(SPICE_PDF)
+doc: $(DOC)/$(SPICE_PDF) $(DOC)/$(FEMM_PDF)
 $(DOC)/$(SPICE_PDF):
 	$(WGET) -O $@ $(SPICE_URL)/$(SPICE_PDF)
+$(DOC)/$(FEMM_PDF):
+	$(WGET) -O $@ $(FEMM_PDF_URL)
 
 # required development packages
 
