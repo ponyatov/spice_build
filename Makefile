@@ -2,13 +2,18 @@
 
 SPICE_VER = 27
 
+# component name with version
+
+SPICE = ngspice-$(SPICE_VER)
+
 # component source code arhives (excluding git-cloned)
 
-SPICE_GZ = 
+SPICE_GZ  = $(SPICE).tar.gz
+SPICE_PDF = $(SPICE)-manual.pdf 
 
 # component download URLs
 
-SPICE_URL = 
+SPICE_URL = https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/$(SPICE_VER)
 
 # directories
 
@@ -27,7 +32,7 @@ WGET = wget -c
 # default
 
 .PHONY: all
-all: dirs src doc
+all: dirs doc src
 
 # directory structure
 
@@ -37,21 +42,28 @@ dirs:
 	ln -fs ~/src $(SRC) ; ln -fs ~/tmp $(TMP)
 	
 # make source code
-	
+
 .PHONY: src
-src:
+src: spice
+
+$(SRC)/%/configure: $(GZ)/%.tar.gz
+	cd $(SRC) ; tar zx < $< && touch $@
 
 # SPICE
 
 .PHONY: spice
-spice:
+spice: $(SRC)/$(SPICE)/configure
+	rm -rf $(TMP)/$(SPICE) ; mkdir $(TMP)/$(SPICE) ; cd $(TMP)/$(SPICE) ;\
+	$< --prefix=$(CWD)/$@ && $(MAKE) -j$(PROC_NUM) 
+$(GZ)/$(SPICE_GZ):
+	$(WGET) -O $@ $(SPICE_URL)/$(SPICE_GZ)
 
 # manuals
 
 .PHONY: doc
-doc: $(DOC)/ngspice-$(SPICE_VER)-manual.pdf
-$(DOC)/ngspice-$(SPICE_VER)-manual.pdf:
-	$(WGET) -O $@ https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/$(SPICE_VER)/ngspice-$(SPICE_VER)-manual.pdf
+doc: $(DOC)/$(SPICE_PDF)
+$(DOC)/$(SPICE_PDF):
+	$(WGET) -O $@ $(SPICE_URL)/$(SPICE_PDF)
 
 # required development packages
 
